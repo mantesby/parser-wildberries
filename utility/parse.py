@@ -1,5 +1,6 @@
 import requests
 import json
+from bs4 import BeautifulSoup
 
 class WildBerriesParser():
     
@@ -30,14 +31,72 @@ class WildBerriesParser():
         
     def set_cookie(self, token):
         self._cookie["x_wbaas_token"] = token
-
-    def parse_page(self, url):
-        with self.__session as session:
-            session.params = self._params
-            response = session.get(url, cookies=self._cookie)
-            response_json = response.json()
-            description = response_json.get("description")
             
+    def _find_basket(self, card_id):
+        part = card_id // 1000
+        vol = card_id // 100000
+        
+        for i in range(36, 60):
+            url = f"https://basket-{i}.wbbasket.ru/vol{vol}/part{part}/{card_id}/images/hq/1.webp"
+            response = self.__session.get(url)
+            print(i, response.status_code)
+            if response.status_code == 200:
+                return i
+        
+        raise requests.HTTPError("Слишком много http запросов")
+    
+    def _get_basket(self, card_id: int):
+        vol = card_id // 100000
+        if vol <= 143: return '01'
+        elif vol >= 144 and vol <= 287: return '02'
+        elif vol >= 288 and vol <= 431: return '03'
+        elif vol >= 432 and vol <= 719: return '04'
+        elif vol >= 720 and vol <= 1007: return '05'
+        elif vol >= 1008 and vol <= 1061: return '06'
+        elif vol >= 1062 and vol <= 1115: return '07'
+        elif vol >= 1116 and vol <= 1169: return '08'
+        elif vol >= 1170 and vol <= 1313: return '09'
+        elif vol >= 1314 and vol <= 1601: return '10'
+        elif vol >= 1602 and vol <= 1655: return '11'
+        elif vol >= 1656 and vol <= 1919: return '12'
+        elif vol >= 1920 and vol <= 2045: return '13'
+        elif vol >= 2046 and vol <= 2189: return '14'
+        elif vol >= 2190 and vol <= 2405: return '15'
+        elif vol >= 2406 and vol <= 2621: return '16'
+        elif vol >= 2622 and vol <= 2837: return '17'
+        elif vol >= 2838 and vol <= 3053: return '18'
+        elif vol >= 3054 and vol <= 3269: return '19'
+        elif vol >= 3270 and vol <= 3485: return '20'
+        elif vol >= 3486 and vol <= 3701: return '21'
+        elif vol >= 3702 and vol <= 3917: return '22'
+        elif vol >= 3918 and vol <= 4133: return '23'
+        elif vol >= 4134 and vol <= 4349: return '24'
+        elif vol >= 4350 and vol <= 4555: return '25'
+        elif vol >= 4566 and vol <= 4877: return '26'
+        elif vol >= 4878 and vol <= 5189: return '27'
+        elif vol >= 5190 and vol <= 5501: return '28'
+        elif vol >= 5502 and vol <= 5813: return '29'
+        elif vol >= 5814 and vol <= 6125: return '30'
+        elif vol >= 6126 and vol <= 6437: return '31'
+        elif vol >= 6438 and vol <= 6749: return '32'
+        elif vol >= 6750 and vol <= 7061: return '33'
+        elif vol >= 7062 and vol <= 7373: return '34'
+        elif vol >= 7374 and vol <= 7687: return '35'
+        else: return self._find_basket(card_id)
+                
+
+    def _request_page(self, card_id):
+        with self.__session as session:
+            basket_shard = self._get_basket(card_id)
+            part = card_id // 1000
+            vol = card_id // 100000
+            url = f"https://basket-{basket_shard}.wbbasket.ru/vol{vol}/part{part}/{card_id}/info/ru/card.json"
+            response = session.get(url, cookies=self._cookie)
+            data_response = response.json()
+            data_card = {
+                "description": data_response["description"],
+            }
+            return data_card
 
     def parse_products(self, query: str, page: int):
         products = self._request(query, page)
@@ -52,17 +111,20 @@ class WildBerriesParser():
             data["price"] = product["sizes"][0]["price"]["product"]
             data["seller"] = product["brand"]
             data["page_seller"] = f"https://www.wildberries.ru/seller/{product["supplierId"]}"
+            data["total"] = product["totalQuantity"]
             for size in product["sizes"]:
                 data.setdefault("size", []).append(size["name"])
+            data_page = self._request_page(product["id"])
+            data["description"] = data_page["description"]
             filter_profucts.append(data)
+            break
         print(filter_profucts)
 
     def _request(self, query: str, page: int):
         with self.__session as session:
             self._params["query"] = query
             self._params["page"] = page
-            session.params = self._params
-            response = session.get(self.__url, cookies=self._cookie)
+            response = session.get(self.__url, params=self._params, cookies=self._cookie)
             if response.status_code == 498:
                 raise requests.RequestException("Не установлен cookie x_wbaas_token")
             response_json = response.json()
@@ -83,4 +145,4 @@ if __name__ == "__main__":
     
     parser = WildBerriesParser()
     parser.set_cookie(token)
-    parser.parse_products("тарелки стеклянные", 1)
+    print(parser.parse_products("пальто из натуральной шерсти", 1))
