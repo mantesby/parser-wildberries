@@ -95,6 +95,8 @@ class WildBerriesParser():
             data_response = response.json()
             data_card = {
                 "description": data_response["description"],
+                "main_info": data_response["grouped_options"][0],
+                "additional_info": data_response["grouped_options"][1]
             }
             return data_card
 
