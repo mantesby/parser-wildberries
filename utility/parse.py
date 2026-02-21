@@ -1,6 +1,5 @@
 import requests
 import json
-from bs4 import BeautifulSoup
 
 class WildBerriesParser():
     
@@ -84,8 +83,16 @@ class WildBerriesParser():
         elif vol >= 7374 and vol <= 7687: return '35'
         else: return self._find_basket(card_id)
                 
+    def _request_page_img(self, card_id: int, count_img: int):
+        basket_shard = self._get_basket(card_id)
+        part = card_id // 1000
+        vol = card_id // 100000
+        urls_image = []
+        for i in range(1, count_img + 1):
+            urls_image.append(f"https://basket-{basket_shard}.wbbasket.ru/vol{vol}/part{part}/{card_id}/images/big/{i}.webp")
+        return urls_image
 
-    def _request_page(self, card_id):
+    def _request_page_info(self, card_id: int):
         with self.__session as session:
             basket_shard = self._get_basket(card_id)
             part = card_id // 1000
@@ -116,8 +123,12 @@ class WildBerriesParser():
             data["total"] = product["totalQuantity"]
             for size in product["sizes"]:
                 data.setdefault("size", []).append(size["name"])
-            data_page = self._request_page(product["id"])
+            data_page = self._request_page_info(product["id"])
+            urls_image_card = self._request_page_img(product["id"], product["pics"])
             data["description"] = data_page["description"]
+            data["main_info"] = data_page["main_info"]
+            data["additional_info"] = data_page["additional_info"]
+            data["pics"] = urls_image_card
             filter_profucts.append(data)
             break
         print(filter_profucts)
@@ -147,4 +158,4 @@ if __name__ == "__main__":
     
     parser = WildBerriesParser()
     parser.set_cookie(token)
-    print(parser.parse_products("пальто из натуральной шерсти", 1))
+    parser.parse_products("ботинки из натуральной кожи", 1)
