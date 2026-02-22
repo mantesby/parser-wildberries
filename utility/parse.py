@@ -1,5 +1,6 @@
 import requests
 import json
+import time
 
 class WildBerriesParser():
     
@@ -35,7 +36,7 @@ class WildBerriesParser():
         part = card_id // 1000
         vol = card_id // 100000
         
-        for i in range(36, 60):
+        for i in range(39, 60):
             url = f"https://basket-{i}.wbbasket.ru/vol{vol}/part{part}/{card_id}/images/hq/1.webp"
             response = self.__session.get(url)
             print(i, response.status_code)
@@ -80,7 +81,10 @@ class WildBerriesParser():
         elif vol >= 6438 and vol <= 6749: return '32'
         elif vol >= 6750 and vol <= 7061: return '33'
         elif vol >= 7062 and vol <= 7373: return '34'
-        elif vol >= 7374 and vol <= 7687: return '35'
+        elif vol >= 7374 and vol <= 7685: return '35'
+        elif vol >= 7686 and vol <= 7997: return '36'
+        elif vol >= 7998 and vol <= 8309: return '37'
+        elif vol >= 8310 and vol <= 8621: return '38'
         else: return self._find_basket(card_id)
                 
     def _request_page_img(self, card_id: int, count_img: int):
@@ -110,6 +114,8 @@ class WildBerriesParser():
     def parse_products(self, query: str, page: int):
         products = self._request(query, page)
         filter_profucts = []
+        count = 0
+        start_time = time.perf_counter()
         for product in products:
             data = {}
             data["url_card"] = f"https://www.wildberries.ru/catalog/{product["id"]}/detail.aspx"
@@ -117,7 +123,7 @@ class WildBerriesParser():
             data["name"] = product["name"]
             data["reviewRating"] = product["reviewRating"]
             data["reviews"] = product["feedbacks"]
-            data["price"] = product["sizes"][0]["price"]["product"]
+            data["price"] = product["sizes"][0]["price"]["product"] // 100
             data["seller"] = product["brand"]
             data["page_seller"] = f"https://www.wildberries.ru/seller/{product["supplierId"]}"
             data["total"] = product["totalQuantity"]
@@ -130,8 +136,11 @@ class WildBerriesParser():
             data["additional_info"] = data_page["additional_info"]
             data["pics"] = urls_image_card
             filter_profucts.append(data)
-            break
-        print(filter_profucts)
+            count += 1
+            print(f"Спарсили {count} из {len(products)}")
+        end_time = time.perf_counter()
+        print(f"Время выполнения: {end_time - start_time:.6f} секунд")
+        return filter_profucts
 
     def _request(self, query: str, page: int):
         with self.__session as session:
@@ -158,4 +167,4 @@ if __name__ == "__main__":
     
     parser = WildBerriesParser()
     parser.set_cookie(token)
-    parser.parse_products("ботинки из натуральной кожи", 1)
+    print(parser.parse_products("ботинки из натуральной кожи", 1))
