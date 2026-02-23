@@ -107,7 +107,7 @@ class WildBerriesParser():
             data_card = {
                 "description": data_response["description"],
                 "main_info": data_response["grouped_options"][0],
-                "additional_info": data_response["grouped_options"][1]
+                "additional_info": data_response["grouped_options"][1],
             }
             return data_card
 
@@ -131,7 +131,7 @@ class WildBerriesParser():
                 data.setdefault("size", []).append(size["name"])
             data_page = self._request_page_info(product["id"])
             urls_image_card = self._request_page_img(product["id"], product["pics"])
-            data["description"] = data_page["description"]
+            data["description"] = data_page.get("description")
             data["main_info"] = data_page["main_info"]
             data["additional_info"] = data_page["additional_info"]
             data["pics"] = urls_image_card
@@ -139,7 +139,7 @@ class WildBerriesParser():
             count += 1
             print(f"Спарсили {count} из {len(products)}")
         end_time = time.perf_counter()
-        print(f"Время выполнения: {end_time - start_time:.6f} секунд")
+        print(f"Время выполнения: {round(end_time - start_time)} секунд")
         return filter_profucts
 
     def _request(self, query: str, page: int):
@@ -167,4 +167,4 @@ if __name__ == "__main__":
     
     parser = WildBerriesParser()
     parser.set_cookie(token)
-    print(parser.parse_products("ботинки из натуральной кожи", 1))
+    print(parser.parse_products("пальто из натуральной шерсти", 2))
