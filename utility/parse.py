@@ -104,6 +104,7 @@ class WildBerriesParser():
             url = f"https://basket-{basket_shard}.wbbasket.ru/vol{vol}/part{part}/{card_id}/info/ru/card.json"
             response = session.get(url, cookies=self._cookie)
             data_response = response.json()
+            
             data_card = {
                 "description": data_response["description"],
                 "main_info": data_response["grouped_options"][0],
@@ -111,36 +112,61 @@ class WildBerriesParser():
             }
             return data_card
 
-    def parse_products(self, query: str, page: int):
+    def parse_products(self):
+        query = input("Введите поисковый запрос (по умолчанию 'пальто из натуральной шерсти'): ") or "пальто из натуральной шерсти"
+        get_pages = self._request_pages(query)
+        page = int(input(f"Введите номер страницы которую вы хотите спарсить от 1 до {get_pages // 100 + 1} (всего {get_pages} карточек): "))
+        if page > get_pages // 100 + 1 or page < 1:
+            raise ValueError(f"Введите число от 1 до {get_pages // 100 + 1}")
         products = self._request(query, page)
         filter_profucts = []
         count = 0
         start_time = time.perf_counter()
         for product in products:
-            data = {}
-            data["url_card"] = f"https://www.wildberries.ru/catalog/{product["id"]}/detail.aspx"
-            data["id"] = product["id"]
-            data["name"] = product["name"]
-            data["reviewRating"] = product["reviewRating"]
-            data["reviews"] = product["feedbacks"]
-            data["price"] = product["sizes"][0]["price"]["product"] // 100
-            data["seller"] = product["brand"]
-            data["page_seller"] = f"https://www.wildberries.ru/seller/{product["supplierId"]}"
-            data["total"] = product["totalQuantity"]
-            for size in product["sizes"]:
-                data.setdefault("size", []).append(size["name"])
-            data_page = self._request_page_info(product["id"])
-            urls_image_card = self._request_page_img(product["id"], product["pics"])
-            data["description"] = data_page.get("description")
-            data["main_info"] = data_page["main_info"]
-            data["additional_info"] = data_page["additional_info"]
-            data["pics"] = urls_image_card
-            filter_profucts.append(data)
+            try:
+                data = {}
+                data["url_card"] = f"https://www.wildberries.ru/catalog/{product["id"]}/detail.aspx"
+                data["id"] = product["id"]
+                data["name"] = product["name"]
+                data["reviewRating"] = product["reviewRating"]
+                data["reviews"] = product["feedbacks"]
+                data["price"] = product["sizes"][0]["price"]["product"] // 100
+                data["seller"] = product["brand"]
+                data["page_seller"] = f"https://www.wildberries.ru/seller/{product["supplierId"]}"
+                data["total"] = product["totalQuantity"]
+                for size in product["sizes"]:
+                    data.setdefault("size", []).append(size["name"])
+                data_page = self._request_page_info(product["id"])
+                urls_image_card = self._request_page_img(product["id"], product["pics"])
+                data["description"] = data_page.get("description")
+                data["main_info"] = data_page["main_info"]
+                data["additional_info"] = data_page["additional_info"]
+                data["pics"] = urls_image_card
+                filter_profucts.append(data)
+            except Exception as e:
+                print(f"Ошибка парсинга карточки https://www.wildberries.ru/catalog/{product["id"]}/detail.aspx")
+                print(e)
             count += 1
             print(f"Спарсили {count} из {len(products)}")
         end_time = time.perf_counter()
         print(f"Время выполнения: {round(end_time - start_time)} секунд")
         return filter_profucts
+    
+    def _request_pages(self, query: str, page: int = 1):
+        with self.__session as session:
+            self._params["query"] = query
+            self._params["page"] = page
+            response = session.get(self.__url, params=self._params, cookies=self._cookie)
+            if response.status_code == 498:
+                raise requests.RequestException("Не установлен cookie x_wbaas_token")
+            response_json = response.json()
+            products = response_json.get("products")
+            total: int = response_json.get("total")
+            
+            if (products is None or len(products) == 0) and total // 100 + 1 < page:
+                raise requests.RequestException("Страницы не существует")
+            
+            return total
 
     def _request(self, query: str, page: int):
         with self.__session as session:
@@ -167,4 +193,4 @@ if __name__ == "__main__":
     
     parser = WildBerriesParser()
     parser.set_cookie(token)
-    print(parser.parse_products("пальто из натуральной шерсти", 2))
+    print(parser.parse_products())

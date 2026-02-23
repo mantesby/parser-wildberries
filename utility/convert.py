@@ -1,21 +1,14 @@
 import csv
-import parse
 import pandas as pd
 import os
 
-parser = parse.WildBerriesParser()
-parser.set_cookie("1.1000.7c6a2931091a4657a8a5138016d80c99.MTV8NjYuMTUxLjQwLjQzfE1vemlsbGEvNS4wIChXaW5kb3dzIE5UIDEwLjA7IFdpbjY0OyB4NjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xNDQuMC4wLjAgU2FmYXJpLzUzNy4zNnwxNzcyNzk1NTE4fHJldXNhYmxlfDJ8ZXlKb1lYTm9Jam9pSW4wPXwwfDN8MTc3MjE5MDcxOHwx.MEYCIQCaQh2KDTChuOCWHVu5LZ1OVINtcqkAayhU3EisU9uoHQIhAOqLbQy8LBfy9GiUDRKiek1xP6gFvNvBoVhkXOosTUEn")
-
-
-
-def write_full_info():
+def write_full_info(cards: list):
     with open('parser_wildberries.csv', 'a', newline='', encoding="utf-8-sig") as csvfile:
         fieldnames = ['Ссылка на товар', 'Артикул', "Название", "Цена", "Описание",
                     "Ссылки на изображения", "Основная информация", "Дополнительная информация",
                     "Название селлера", "Ссылка на селлера", "Размеры товара",
                     "Остатки товара", "Рейтинг", "Количество отзывов"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        cards = parser.parse_products("ботинки из натуральной кожи", 5)
         for card in cards:
             urls_pics = ""
             for pic in card["pics"]:
@@ -59,10 +52,8 @@ def write_full_info():
                             "Название селлера": card["seller"], "Ссылка на селлера": card["page_seller"],
                             "Размеры товара": size_text, "Остатки товара": card["total"],
                             "Рейтинг": card["reviewRating"], "Количество отзывов": card["reviews"]})
-                    
+    df = pd.read_csv("parser_wildberries.csv")
+    df.to_excel("wb.xlsx")
+    df_filter = pd.read_csv('parser_wildberries_filter.csv')
+    df_filter.to_excel("wb_filter.xlsx")
 
-write_full_info()
-df = pd.read_csv("parser_wildberries.csv")
-df.to_excel("wb.xlsx")
-df_filter = pd.read_csv('parser_wildberries_filter.csv')
-df_filter.to_excel("wb_filter.xlsx")

@@ -6,7 +6,21 @@
 
 ![Python Status](https://img.shields.io/badge/Python-3.13.1-blue)
 ![requests required](https://img.shields.io/badge/Requests-required-white)
+![requests required](https://img.shields.io/badge/pandas-required-yellow)
+![requests required](https://img.shields.io/badge/excel-xlsx-green)
 
+
+## Инструкция
+Выполните команду 
+```cmd
+pip install -r requirements.txt
+```
+
+В файле main.py установите собственный cookie под названием **x_wbaas_token** на сайте wildberries.
+Запустите main.py
+```bash
+python main.py
+```
 
 ## Cкорость
 ### Синхронный подход
@@ -34,8 +48,8 @@
 - [x] Количество отзывов
 ### Data storage
 - [x] Сохранение данных в xlsx файл
-- [ ] Отдельный файл xlsx для рейтинга, стоимости и страны
-### Roadmap
+- [x] Отдельный файл xlsx для рейтинга, стоимости и страны
+### Roadmap (опционально)
 - [ ] Асинхронные http запросы карточкам
 - [ ] Логирование
 - [ ] Код ревью 
