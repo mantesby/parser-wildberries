@@ -1,9 +1,26 @@
+import logging
+
 class BaseHttpConifig():
     def __init__(self, ab_testing: str = "false", appType: int = 1, curr: str = "rub",
                  dest: int = -1257786, hide_vflags: int = 4294967296, lang: str = "ru", resultset: str = "catalog",
                  sort: str = "popular", spp: int = 30, suppressSpellcheck: str = "false") -> None:
+        """
+        
+        Attributes:
+            ab_testing: Сравнение двух вариантов элемента карточки товара, лучше всегда false.
+            appType: Тип приложения: 1 = веб, 4 = мобильное. Влияет на формат данных.
+            curr: rub - рубли, usd - доллары и т.д.
+            dest: Регион или склад. Определяет наличие товара и цену.
+            hide_vflags: Не знаю. Лучше не трогать.
+            lang: Язык интерфейса и описаний товаров.
+            resultset: Скорее всего тип поиска. Обычно catalog.
+            sort: Сортировка результатов: популярные, по цене, рейтингу и т.д.
+            spp: Количество товаров на одной странице.
+                   
+        """
         
         self._url = "https://www.wildberries.ru/__internal/u-search/exactmatch/ru/common/v18/search"
+        self.logger = logging.getLogger("request")
         
         self._cookie = {
         "x_wbaas_token": ""
@@ -22,16 +39,21 @@ class BaseHttpConifig():
             "spp": spp,
             "suppressSpellcheck": suppressSpellcheck
         }
+            
+    def set_cookie(self, cookie):
+        self._cookie["x_wbaas_token"] = cookie
         
     def _url_card_base(self, card_id: int) -> str:
         vol = card_id // 100000
         part = card_id // 1000
         shard = self._get_basket(vol)
+        self.logger.debug("Использование базового url для id {card_id}")
         return f"https://basket-{shard}.wbbasket.ru/vol{vol}/part{part}/{card_id}"
             
         
     def _url_card_info(self, card_id: int) -> str:
         base_url = self._url_card_base(card_id)
+        self.logger.debug('Карточка основной информации с id {card_id}')
         return f"{base_url}/info/ru/card.json"
         
     def _url_card_images(self, card_id: int, length_pic: int) -> list[str]:
@@ -39,9 +61,11 @@ class BaseHttpConifig():
         urls_image = []
         for number_pic in range(1, length_pic + 1):
             urls_image.append(base_url + f"images/big/{number_pic}.webp")
+        self.logger.debug("urls изображений товара с id {card_id}, а их количество {length_pic}")
         return urls_image
         
     def _get_basket(self, vol: int) -> str:
+        self.logger.debug("Поиск шардов товара")
         if vol <= 143: return '01'
         elif vol >= 144 and vol <= 287: return '02'
         elif vol >= 288 and vol <= 431: return '03'

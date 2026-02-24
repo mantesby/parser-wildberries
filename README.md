@@ -6,8 +6,9 @@
 
 ![Python Status](https://img.shields.io/badge/Python-3.13.1-blue)
 ![requests required](https://img.shields.io/badge/Requests-required-white)
-![requests required](https://img.shields.io/badge/pandas-required-yellow)
-![requests required](https://img.shields.io/badge/excel-xlsx-green)
+![pandas required](https://img.shields.io/badge/pandas-required-yellow)
+![aiohttp required](https://img.shields.io/badge/aiohttp-required-violet)
+![excel required](https://img.shields.io/badge/excel-xlsx-green)
 
 
 ## Инструкция
