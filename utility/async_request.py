@@ -11,6 +11,7 @@ class AsyncWildBerriesRequest(BaseHttpConifig):
                  dest: int = -1257786, hide_vflags: int = 4294967296, lang: str = "ru", resultset: str = "catalog",
                  sort: str = "popular", spp: int = 30, suppressSpellcheck: str = "false") -> None:
         super().__init__(ab_testing, appType, curr, dest, hide_vflags, lang, resultset, sort, spp, suppressSpellcheck)
+        
         self.__session = aiohttp.ClientSession
         
     async def _fetch_page(self, page, count):
@@ -23,10 +24,10 @@ class AsyncWildBerriesRequest(BaseHttpConifig):
                     response.raise_for_status()
                     card_json = await response.json()
             except aiohttp.ClientResponseError as e:
-                logging.error(f"HTTP error: страница карточки {url_card} Код ошибки: {e.status}, Причина: {e.message}")
+                self.logger.error(f"HTTP error: страница карточки {url_card} Код ошибки: {e.status}, Причина: {e.message}")
             
             self.logger.info(f"Карточка {count} успешно взята")
-            return {"page_info": page, "card_info": card_json, "image_info": urls_image}            
+            return {"page_info": page, "card_info": card_json, "images_info": urls_image}            
         
     async def session_page(self, query, page):
         self._params["page"] = page
@@ -51,6 +52,14 @@ class AsyncWildBerriesRequest(BaseHttpConifig):
             self.logger.info(f"Время выполнения: {round(end_time - start_time)} секунд")
             return result
             
+    async def _get_pages_query(self, query):
+        self._params["query"] = query
+        self._params["page"] = 1
+        self.logger.info("Извлечение количества страниц поискового запроса")
+        async with self.__session(cookies=self._cookie) as session:
+            async with session.get(self._url, params=self._params) as response:
+                json = await response.json(content_type=None)
+                return json["total"] 
             
 async def main():
     dotenv.load_dotenv()
