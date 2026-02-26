@@ -2,7 +2,7 @@
 
 > Продвинутый парсер для маркетплейса wildberries.
 
-> Разработан в качестве pet project. Которым важно анализировать рынок 
+> Разработан в качестве pet project.
 
 ![Python Status](https://img.shields.io/badge/Python-3.13.1-blue)
 ![requests required](https://img.shields.io/badge/Requests-required-white)
@@ -17,7 +17,7 @@
 pip install -r requirements.txt
 ```
 
-В файле main.py установите собственный cookie под названием **x_wbaas_token** на сайте wildberries.
+В файле main.py установите собственный cookie под названием **x_wbaas_token**, его можно достать при заходе на сайт wildberries.
 Запустите main.py
 ```bash
 python main.py
