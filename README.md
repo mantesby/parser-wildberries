@@ -11,16 +11,31 @@
 ![excel required](https://img.shields.io/badge/excel-xlsx-green)
 
 
-## Инструкция
+## Установка
 Выполните команду 
 ```cmd
 pip install git+https://github.com/mantesby/parser-wildberries
 ```
 
-В файле main.py установите собственный cookie под названием **x_wbaas_token**, его можно достать при заходе на сайт wildberries.
-Запустите main.py
-```bash
-python main.py
+## Использование
+```python
+import asyncio
+import logging
+from os import getenv
+
+from parser_wildberries import AsyncWildberriesParser
+
+
+async def main():
+    logging.basicConfig(level=logging.INFO)
+    parser = AsyncWildberriesParser()
+    parser.set_cookie(getenv("X_WBAAS_TOKEN"))
+    await parser.start()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
 ```
 
 ## Cкорость
