@@ -1,11 +1,12 @@
-import pandas as pd
 import logging
+
 import openpyxl
+import pandas as pd
 
 
 class XlsxManager:
     def __init__(self) -> None:
-        self.logger = logging.getLogger("filename")
+        self.logger_xlsx = logging.getLogger("filename")
 
     def _images_text(self, pics):
         text = ""
@@ -60,7 +61,7 @@ class XlsxManager:
                 return i["value"]
 
     def convert(self, row_data_list):
-        self.logger.debug("Подготовка данных в формат для excel")
+        self.logger_xlsx.debug("Подготовка данных в формат для excel")
         data_for_excel = {
             "Ссылка на товар": [],
             "Артикул": [],
@@ -89,7 +90,7 @@ class XlsxManager:
                 and country == "Россия"
             ):
                 self._add_to_data(filter_data_for_excel, row_init)
-        self.logger.debug("Данные успешно подготовлены")
+        self.logger_xlsx.debug("Данные успешно подготовлены")
         return data_for_excel, filter_data_for_excel
 
     def save_to_excel(self, data):
@@ -117,7 +118,7 @@ class XlsxManager:
                 header=False,
                 startrow=start_row,
             )
-        self.logger.info("Добавлены данные в обычный файл xlsx")
+        self.logger_xlsx.info("Data have added in xlsx")
 
         with pd.ExcelWriter(
             filename_filter, mode="a", if_sheet_exists="overlay", engine="openpyxl"
@@ -129,4 +130,4 @@ class XlsxManager:
                 header=False,
                 startrow=start_row2,
             )
-        self.logger.info("Добавлены данные в фильтрованный файл xlsx")
+        self.logger_xlsx.info("Filter data have added in xlsx")

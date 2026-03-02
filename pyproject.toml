@@ -1,0 +1,21 @@
+[build-system]
+requires = [
+    "setuptools==80.9.0",
+    "setuptools-scm[simple]==9.2.0",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 88
+fix = true
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+
+[project]
+version = "0.1.0"
+name = "parser-wildberries"

@@ -18,7 +18,7 @@ class BaseHttpConifig:
         """
 
         Attributes:
-            ab_testing: Сравнение двух вариантов элемента карточки товара, лучше всегда false.
+            ab_testing: Сравнение двух вариантов элемента карточки товара.
             appType: Тип приложения: 1 = веб, 4 = мобильное. Влияет на формат данных.
             curr: rub - рубли, usd - доллары и т.д.
             dest: Регион или склад. Определяет наличие товара и цену.
@@ -126,7 +126,7 @@ class BaseHttpConifig:
             return "24"
         elif vol >= 4350 and vol <= 4555:
             return "25"
-        elif vol >= 4566 and vol <= 4877:
+        elif vol >= 4556 and vol <= 4877:
             return "26"
         elif vol >= 4878 and vol <= 5189:
             return "27"

@@ -14,7 +14,7 @@
 ## Инструкция
 Выполните команду 
 ```cmd
-pip install -r requirements.txt
+pip install git+https://github.com/mantesby/parser-wildberries
 ```
 
 В файле main.py установите собственный cookie под названием **x_wbaas_token**, его можно достать при заходе на сайт wildberries.
@@ -24,12 +24,6 @@ python main.py
 ```
 
 ## Cкорость
-### Синхронный подход
-1. **147** sec.
-2. **152** sec.
-3. **186** sec.
-4. **168** sec.
-5. **170** sec.
 ### Асинхронный подход
 1. **4** sec.
 2. **4** sec.

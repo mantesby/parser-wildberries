@@ -1,13 +1,14 @@
-import dotenv
-import os
 import asyncio
-from utility.async_parse import AsyncWildberriesParser
+import logging
+from os import getenv
+
+from parser_wildberries import AsyncWildberriesParser
 
 
 async def main():
-    dotenv.load_dotenv()
+    logging.basicConfig(level=logging.INFO)
     parser = AsyncWildberriesParser()
-    parser.set_cookie(os.getenv("X_WBAAS_TOKEN"))
+    parser.set_cookie(getenv("X_WBAAS_TOKEN"))
     await parser.start()
 
 

@@ -1,10 +1,12 @@
 import asyncio
-import aiohttp
 import logging
-import dotenv
 import os
 import time
-from utility.base_http import BaseHttpConifig
+
+import aiohttp
+import dotenv
+
+from parser_wildberries.async_http.base_http import BaseHttpConifig
 
 
 class AsyncWildBerriesRequest(BaseHttpConifig):
@@ -47,10 +49,12 @@ class AsyncWildBerriesRequest(BaseHttpConifig):
                     card_json = await response.json()
             except aiohttp.ClientResponseError as e:
                 self.logger.error(
-                    f"HTTP error: страница карточки {url_card} Код ошибки: {e.status}, Причина: {e.message}"
+                    f"""HTTP error: page card: {url_card}.
+                    code error: {e.status}.
+                    reason: {e.message}"""
                 )
 
-            self.logger.info(f"Карточка {count} успешно взята")
+            self.logger.info(f"Card {count} have parsed successful")
             return {
                 "page_info": page,
                 "card_info": card_json,
@@ -63,7 +67,7 @@ class AsyncWildBerriesRequest(BaseHttpConifig):
 
         async with self.__session(cookies=self._cookie) as session:
             tasks = []
-            self.logger.debug("Получение информации для парсинга всей страницы")
+            self.logger.debug("Get info for parsing all page")
             async with session.get(
                 self._url, params=self._params, headers={"Accept": "application/json"}
             ) as response:
@@ -79,13 +83,13 @@ class AsyncWildBerriesRequest(BaseHttpConifig):
             start_time = time.perf_counter()
             result = await asyncio.gather(*tasks)
             end_time = time.perf_counter()
-            self.logger.info(f"Время выполнения: {round(end_time - start_time)} секунд")
+            self.logger.info(f"Execution time: {round(end_time - start_time)} sec.")
             return result
 
     async def _get_pages_query(self, query):
         self._params["query"] = query
         self._params["page"] = 1
-        self.logger.info("Извлечение количества страниц поискового запроса")
+        self.logger.info("Extracting the number of pages of a search query")
         async with self.__session(cookies=self._cookie) as session:
             async with session.get(self._url, params=self._params) as response:
                 json = await response.json(content_type=None)

@@ -1,6 +1,6 @@
-from utility.async_request import AsyncWildBerriesRequest
-from utility.filter import Filter
-from utility.file_saver import XlsxManager
+from parser_wildberries.async_http.async_request import AsyncWildBerriesRequest
+from parser_wildberries.file_saver import XlsxManager
+from parser_wildberries.filter import Filter
 
 
 class AsyncWildberriesParser(AsyncWildBerriesRequest, Filter, XlsxManager):
@@ -30,7 +30,7 @@ class AsyncWildberriesParser(AsyncWildBerriesRequest, Filter, XlsxManager):
             suppressSpellcheck,
         )
 
-    async def start(self):
+    async def start(self) -> None:
         query = (
             input(
                 "Введите поисковый запрос (по умолчанию 'пальто из натуральной шубы'): "
@@ -41,7 +41,8 @@ class AsyncWildberriesParser(AsyncWildBerriesRequest, Filter, XlsxManager):
         pages = len_cards // 100 + 1
         page = int(
             input(
-                f"Введите страницу которую вы хотите спарсить от 1 до {pages} (всего {len_cards} карточек): "
+                f"""Введите страницу которую вы хотите спарсить от 1 до {pages}
+                (всего {len_cards} карточек): """
             )
         )
         json_data = await self.session_page(query, page)
