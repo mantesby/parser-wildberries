@@ -1,3 +1,4 @@
+import bisect
 import logging
 
 
@@ -75,86 +76,52 @@ class BaseHttpConifig:
         return urls_image
 
     def _get_basket(self, vol: int) -> str:
-        self.logger.debug("Поиск шардов товара")
-        if vol <= 143:
-            return "01"
-        elif vol >= 144 and vol <= 287:
-            return "02"
-        elif vol >= 288 and vol <= 431:
-            return "03"
-        elif vol >= 432 and vol <= 719:
-            return "04"
-        elif vol >= 720 and vol <= 1007:
-            return "05"
-        elif vol >= 1008 and vol <= 1061:
-            return "06"
-        elif vol >= 1062 and vol <= 1115:
-            return "07"
-        elif vol >= 1116 and vol <= 1169:
-            return "08"
-        elif vol >= 1170 and vol <= 1313:
-            return "09"
-        elif vol >= 1314 and vol <= 1601:
-            return "10"
-        elif vol >= 1602 and vol <= 1655:
-            return "11"
-        elif vol >= 1656 and vol <= 1919:
-            return "12"
-        elif vol >= 1920 and vol <= 2045:
-            return "13"
-        elif vol >= 2046 and vol <= 2189:
-            return "14"
-        elif vol >= 2190 and vol <= 2405:
-            return "15"
-        elif vol >= 2406 and vol <= 2621:
-            return "16"
-        elif vol >= 2622 and vol <= 2837:
-            return "17"
-        elif vol >= 2838 and vol <= 3053:
-            return "18"
-        elif vol >= 3054 and vol <= 3269:
-            return "19"
-        elif vol >= 3270 and vol <= 3485:
-            return "20"
-        elif vol >= 3486 and vol <= 3701:
-            return "21"
-        elif vol >= 3702 and vol <= 3917:
-            return "22"
-        elif vol >= 3918 and vol <= 4133:
-            return "23"
-        elif vol >= 4134 and vol <= 4349:
-            return "24"
-        elif vol >= 4350 and vol <= 4555:
-            return "25"
-        elif vol >= 4556 and vol <= 4877:
-            return "26"
-        elif vol >= 4878 and vol <= 5189:
-            return "27"
-        elif vol >= 5190 and vol <= 5501:
-            return "28"
-        elif vol >= 5502 and vol <= 5813:
-            return "29"
-        elif vol >= 5814 and vol <= 6125:
-            return "30"
-        elif vol >= 6126 and vol <= 6437:
-            return "31"
-        elif vol >= 6438 and vol <= 6749:
-            return "32"
-        elif vol >= 6750 and vol <= 7061:
-            return "33"
-        elif vol >= 7062 and vol <= 7373:
-            return "34"
-        elif vol >= 7374 and vol <= 7685:
-            return "35"
-        elif vol >= 7686 and vol <= 7997:
-            return "36"
-        elif vol >= 7998 and vol <= 8309:
-            return "37"
-        elif vol >= 8310 and vol <= 8621:
-            return "38"
-        elif vol >= 8622 and vol <= 8933:
-            return "39"
-        elif vol >= 8934 and vol <= 9245:
-            return "40"
-        else:
-            return "41"
+        self.logger.debug("Search shards")
+        vol_shards = [
+            143,
+            287,
+            431,
+            719,
+            1007,
+            1061,
+            1115,
+            1169,
+            1313,
+            1601,
+            1655,
+            1919,
+            2045,
+            2189,
+            2405,
+            2621,
+            2837,
+            3053,
+            3269,
+            3485,
+            3701,
+            3917,
+            4133,
+            4349,
+            4555,
+            4877,
+            5189,
+            5501,
+            5813,
+            6125,
+            6437,
+            6749,
+            7061,
+            7373,
+            7685,
+            7997,
+            8309,
+            8621,
+            8933,
+            9245,
+            9557,
+        ]
+
+        integer_shard = bisect.bisect_left(vol_shards, vol) + 1
+        if integer_shard <= 9:
+            return f"0{integer_shard}"
+        return str(integer_shard)

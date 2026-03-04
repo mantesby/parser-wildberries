@@ -6,7 +6,7 @@ import pandas as pd
 
 class XlsxManager:
     def __init__(self) -> None:
-        self.logger_xlsx = logging.getLogger("filename")
+        self.logger = logging.getLogger("filename")
 
     def _images_text(self, pics):
         text = ""
@@ -61,7 +61,7 @@ class XlsxManager:
                 return i["value"]
 
     def convert(self, row_data_list):
-        self.logger_xlsx.debug("Подготовка данных в формат для excel")
+        self.logger.debug("Подготовка данных в формат для excel")
         data_for_excel = {
             "Ссылка на товар": [],
             "Артикул": [],
@@ -90,12 +90,10 @@ class XlsxManager:
                 and country == "Россия"
             ):
                 self._add_to_data(filter_data_for_excel, row_init)
-        self.logger_xlsx.debug("Данные успешно подготовлены")
+        self.logger.debug("Data successful created")
         return data_for_excel, filter_data_for_excel
 
-    def save_to_excel(self, data):
-        filename = "parser_wildberries.xlsx"
-        filename_filter = "parses_wildberries_filter.xlsx"
+    def save_to_excel(self, data, filename: str, filename_filter: str):
         data_excel, filter_data_excel = self.convert(data)
         df = pd.DataFrame(data_excel)
         df.to_excel(filename, index=False)
@@ -118,7 +116,7 @@ class XlsxManager:
                 header=False,
                 startrow=start_row,
             )
-        self.logger_xlsx.info("Data have added in xlsx")
+        self.logger.info("Data have added in xlsx")
 
         with pd.ExcelWriter(
             filename_filter, mode="a", if_sheet_exists="overlay", engine="openpyxl"
@@ -130,4 +128,4 @@ class XlsxManager:
                 header=False,
                 startrow=start_row2,
             )
-        self.logger_xlsx.info("Filter data have added in xlsx")
+        self.logger.info("Filter data have added in xlsx")

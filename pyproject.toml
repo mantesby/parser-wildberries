@@ -1,3 +1,16 @@
+[project]
+name = "parser-wb"
+version = "0.1.0"
+description = "Advanced parser wildberries"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "aiohttp==3.13.3",
+    "openpyxl>=3.1.5",
+    "pandas==3.0.1",
+    "python-dotenv>=1.2.2",
+]
+
 [build-system]
 requires = [
     "setuptools==80.9.0",
@@ -11,11 +24,13 @@ where = ["src"]
 [tool.ruff]
 line-length = 88
 fix = true
-target-version = "py313"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]
 
-[project]
-version = "0.1.0"
-name = "parser-wildberries"
+[dependency-groups]
+dev = [
+    "ruff>=0.15.4",
+]
+

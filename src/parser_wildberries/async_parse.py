@@ -31,20 +31,14 @@ class AsyncWildberriesParser(AsyncWildBerriesRequest, Filter, XlsxManager):
         )
 
     async def start(self) -> None:
-        query = (
-            input(
-                "Введите поисковый запрос (по умолчанию 'пальто из натуральной шубы'): "
-            )
-            or "пальто из натуральной шерсти"
-        )
+        DEFAULT_QUERY = "пальто из натуральной шерсти"
+        QUERY_INPUT_TEXT = f"Введите поисковый запрос (по умолчанию '{DEFAULT_QUERY}'):"
+        query = input(QUERY_INPUT_TEXT) or DEFAULT_QUERY
+
         len_cards = await self._get_pages_query(query)
         pages = len_cards // 100 + 1
-        page = int(
-            input(
-                f"""Введите страницу которую вы хотите спарсить от 1 до {pages}
-                (всего {len_cards} карточек): """
-            )
-        )
+        description_card = f"Введите страницу для парсинга от 1 до {pages}"
+        page = int(input(f"{description_card} (всего {len_cards} карточек): "))
         json_data = await self.session_page(query, page)
         filter_data = self.filtered_data(json_data)
-        self.save_to_excel(filter_data)
+        self.save_to_excel(filter_data, "parser_wb.xlsx", "parser_wb_filter.xlsx")

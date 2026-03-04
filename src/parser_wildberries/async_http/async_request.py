@@ -1,10 +1,7 @@
 import asyncio
-import logging
-import os
 import time
 
 import aiohttp
-import dotenv
 
 from parser_wildberries.async_http.base_http import BaseHttpConifig
 
@@ -41,6 +38,7 @@ class AsyncWildBerriesRequest(BaseHttpConifig):
     async def _fetch_page(self, page, count):
         url_card = self._url_card_info(page["id"])
         urls_image = self._url_card_images(page["id"], page["pics"])
+        card_json = ""
 
         async with self.__session(cookies=self._cookie) as session:
             try:
@@ -78,7 +76,7 @@ class AsyncWildBerriesRequest(BaseHttpConifig):
                 count += 1
                 tasks.append(asyncio.create_task(self._fetch_page(page_json, count)))
 
-            self.logger.debug("Задачи успешно сформированы")
+            self.logger.debug("Tasks created successful")
 
             start_time = time.perf_counter()
             result = await asyncio.gather(*tasks)
@@ -94,15 +92,3 @@ class AsyncWildBerriesRequest(BaseHttpConifig):
             async with session.get(self._url, params=self._params) as response:
                 json = await response.json(content_type=None)
                 return json["total"]
-
-
-async def main():
-    dotenv.load_dotenv()
-    parser = AsyncWildBerriesRequest()
-    parser.set_cookie(os.getenv("X_WBAAS_TOKEN"))
-    await parser.session_page("пально из натуральной кожи", 1)
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    asyncio.run(main())
